@@ -38,6 +38,7 @@ To add a file to DVC tracking:
 ```bash
 dvc add data/data.txt
 git add data/data.txt.dvc
+git add data/.gitignore
 git commit -m "Track data with DVC"
 ```
 
@@ -71,3 +72,41 @@ This updates the working copy of `data/data.txt` to match the DVC metadata in th
 - If you use a remote DVC storage, configure it with `dvc remote add` and `dvc push`.
 - Dagshub integration will be added later; this version is focused on getting the DVC workflow in place first.
  
+
+ ----------------
+
+
+Dagshub: remote repositories to track everything. 
+Conceptual model: GitHub for code, DVC for data, MLflow for models, Dagshub remote repository.
+
+Dagshub: same as Git. We can create a blank repo in dagshub.com, and then clone it here using the URL
+
+Dagshub supports: 1) data, 2) code, 3) experiments
+
+We can connect to any cloud storage bucket.
+
+python library: dagshub
+
+How to add to the Dagshub remote repository the tracking of the data with DVC (commands in the Data section of the Dagshub repository):
+- Set up the Dagshub DVC remote: dvc remote add origin s3://dvc
+- Connect to the Dagshub repo: dvc remote modify origin endpointurl https://dagshub.com/munozgonzalez4/mlops-bootcamp-dvc-intro.s3
+- Set up security credentials: 
+    - dvc remote modify origin --local access_key_id 977de0b62cda70873102f4db3f76e69c926d66e6
+    - dvc remote modify origin --local secret_access_key 977de0b62cda70873102f4db3f76e69c926d66e6
+
+Test: dvc remote list
+
+Pull: dvc pull -r origin
+Push: 
+    - dvc push -r origin
+    - git push origin main
+
+
+When doing changes in the data:
+dvc add data/data.txt
+git add .
+git commit -m "message"
+dvc pull -r origin
+dvc push -r origin
+git push origin main
+
