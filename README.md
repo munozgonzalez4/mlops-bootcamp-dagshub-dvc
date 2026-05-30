@@ -15,3 +15,9 @@ What does git need to track? data.txt.dvc + data/.gitignore
 git add data/data.txt.dvc
 
 Once we change the data: dvc add data/data.txt + git add data/data.txt.dvc
+
+If we want to go back to a previous version of the data:
+git log allows you to see this history of changes
+git checkout <code of commit> -> data.txt.dvc changes but data.txt doesn't
+to change the data: dvc checkout
+git checkout main + dvc checkout -> go back to the most recent commit 
