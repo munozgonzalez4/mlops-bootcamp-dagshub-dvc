@@ -1,23 +1,73 @@
 # mlops-bootcamp-dagshub-dvc
 
-DVC: data version control -> remote repository for data
+A first version of the repository that demonstrates a basic DVC workflow with a tracked data file.
 
-python library: dvc
+This repo is not the final Dagshub-enabled project yet; it currently focuses on explaining how DVC works alongside Git.
 
-As we do git init, we also do dvc init -> folder .dvc is created + .dvcignore file
-These files will need to be added to the git remote repository
+## Contents
 
-Add a data to the tracking system: dvc add data/data.txt --> this automatically adds data.txt to the INTERNAL .gitignore of the data folder, so Git doesn't track the file, it's DVC who does it
-data.txt.dvc contains the hashed key of the data
-In the .dvc/cache we will have the mapping hash -> content
+- `data/`
+  - `data.txt` - sample data tracked by DVC
+  - `data.txt.dvc` - DVC metadata for the tracked file
+- `src/` - project source folder (empty placeholder)
+- `requirements.txt` - Python dependencies
 
-What does git need to track? data.txt.dvc + data/.gitignore
+## Purpose
+
+This repository is meant to show how DVC can be used alongside Git to version data files without checking the raw data itself into Git.
+
+## Setup
+
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. Initialize Git and DVC if not already done:
+   ```bash
+   git init
+   dvc init
+   git add .dvc .dvcignore
+   git commit -m "Initialize DVC"
+   ```
+
+## Tracking data with DVC
+
+To add a file to DVC tracking:
+
+```bash
+dvc add data/data.txt
 git add data/data.txt.dvc
+git commit -m "Track data with DVC"
+```
 
-Once we change the data: dvc add data/data.txt + git add data/data.txt.dvc
+DVC stores the actual file contents in the cache (`.dvc/cache`) and keeps a small metadata file (`data/data.txt.dvc`) in Git.
 
-If we want to go back to a previous version of the data:
-git log allows you to see this history of changes
-git checkout <code of commit> -> data.txt.dvc changes but data.txt doesn't
-to change the data: dvc checkout
-git checkout main + dvc checkout -> go back to the most recent commit 
+## Updating tracked data
+
+When the tracked file changes:
+
+```bash
+dvc add data/data.txt
+git add data/data.txt.dvc
+git commit -m "Update tracked data"
+```
+
+## Restoring data versions
+
+Use Git history together with DVC to restore a previous data version:
+
+```bash
+git checkout <commit>
+dvc checkout
+```
+
+This updates the working copy of `data/data.txt` to match the DVC metadata in the checked-out commit.
+
+## Notes
+
+- Git should track the `.dvc` metadata files, not the large data files themselves.
+- DVC manages the data file contents and the hash mapping inside `.dvc/cache`.
+- If you use a remote DVC storage, configure it with `dvc remote add` and `dvc push`.
+- Dagshub integration will be added later; this version is focused on getting the DVC workflow in place first.
+ 
