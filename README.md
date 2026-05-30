@@ -1,20 +1,22 @@
 # mlops-bootcamp-dagshub-dvc
 
-A first version of the repository that demonstrates a basic DVC workflow with a tracked data file.
-
-This repo is not the final Dagshub-enabled project yet; it currently focuses on explaining how DVC works alongside Git.
+A minimal example repository that combines Git, DVC, and Dagshub-compatible remote storage for data versioning.
 
 ## Contents
 
 - `data/`
-  - `data.txt` - sample data tracked by DVC
-  - `data.txt.dvc` - DVC metadata for the tracked file
-- `src/` - project source folder (empty placeholder)
-- `requirements.txt` - Python dependencies
+  - `data.txt` — sample data file tracked by DVC
+  - `data.txt.dvc` — DVC metadata for the tracked file
+- `src/` — project source folder (placeholder)
+- `requirements.txt` — Python dependencies
 
 ## Purpose
 
-This repository is meant to show how DVC can be used alongside Git to version data files without checking the raw data itself into Git.
+This repository shows how to:
+
+- track file data with DVC
+- keep DVC metadata in Git
+- configure a Dagshub-compatible remote for DVC
 
 ## Setup
 
@@ -33,16 +35,15 @@ This repository is meant to show how DVC can be used alongside Git to version da
 
 ## Tracking data with DVC
 
-To add a file to DVC tracking:
+Add the sample data to DVC tracking:
 
 ```bash
 dvc add data/data.txt
-git add data/data.txt.dvc
-git add data/.gitignore
+git add data/data.txt.dvc data/.gitignore
 git commit -m "Track data with DVC"
 ```
 
-DVC stores the actual file contents in the cache (`.dvc/cache`) and keeps a small metadata file (`data/data.txt.dvc`) in Git.
+DVC stores the file contents in the local cache (`.dvc/cache`) and keeps the small metadata file in Git.
 
 ## Updating tracked data
 
@@ -56,57 +57,52 @@ git commit -m "Update tracked data"
 
 ## Restoring data versions
 
-Use Git history together with DVC to restore a previous data version:
+Restore a previous data version from Git history:
 
 ```bash
 git checkout <commit>
 dvc checkout
 ```
 
-This updates the working copy of `data/data.txt` to match the DVC metadata in the checked-out commit.
+This updates `data/data.txt` to the version recorded by DVC in the checked-out commit.
 
-## Notes
+## Dagshub remote setup
 
-- Git should track the `.dvc` metadata files, not the large data files themselves.
-- DVC manages the data file contents and the hash mapping inside `.dvc/cache`.
-- If you use a remote DVC storage, configure it with `dvc remote add` and `dvc push`.
-- Dagshub integration will be added later; this version is focused on getting the DVC workflow in place first.
- 
+This repo includes an example Dagshub-compatible DVC remote setup. Replace the placeholders with your own Dagshub repository and credentials.
 
- ----------------
+```bash
+dvc remote add origin s3://dvc
 
+dvc remote modify origin endpointurl https://dagshub.com/<username>/<repo>.s3
 
-Dagshub: remote repositories to track everything. 
-Conceptual model: GitHub for code, DVC for data, MLflow for models, Dagshub remote repository.
+dvc remote modify origin --local access_key_id <ACCESS_KEY_ID>
 
-Dagshub: same as Git. We can create a blank repo in dagshub.com, and then clone it here using the URL
+dvc remote modify origin --local secret_access_key <SECRET_ACCESS_KEY>
+```
 
-Dagshub supports: 1) data, 2) code, 3) experiments
+Verify the remote:
 
-We can connect to any cloud storage bucket.
+```bash
+dvc remote list
+```
 
-python library: dagshub
+## Push and pull data
 
-How to add to the Dagshub remote repository the tracking of the data with DVC (commands in the Data section of the Dagshub repository):
-- Set up the Dagshub DVC remote: dvc remote add origin s3://dvc
-- Connect to the Dagshub repo: dvc remote modify origin endpointurl https://dagshub.com/munozgonzalez4/mlops-bootcamp-dvc-intro.s3
-- Set up security credentials: 
-    - dvc remote modify origin --local access_key_id 977de0b62cda70873102f4db3f76e69c926d66e6
-    - dvc remote modify origin --local secret_access_key 977de0b62cda70873102f4db3f76e69c926d66e6
+Push tracked data to the Dagshub remote:
 
-Test: dvc remote list
-
-Pull: dvc pull -r origin
-Push: 
-    - dvc push -r origin
-    - git push origin main
-
-
-When doing changes in the data:
-dvc add data/data.txt
-git add .
-git commit -m "message"
-dvc pull -r origin
+```bash
 dvc push -r origin
 git push origin main
+```
 
+Pull tracked data from the Dagshub remote:
+
+```bash
+dvc pull -r origin
+```
+
+## Workflow notes
+
+- Track DVC metadata files in Git, not the raw data files.
+- Keep DVC credentials local using `--local` so they are not committed.
+- Use `dvc push` and `dvc pull` when sharing data through the remote storage.
